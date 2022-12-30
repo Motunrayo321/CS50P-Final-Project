@@ -1,4 +1,4 @@
-""" This is a program I am writing after many months of neglect and procrastination. """
+""" This is a program I am writing after many months of neglect"""
 
 """
 Layout of the project
