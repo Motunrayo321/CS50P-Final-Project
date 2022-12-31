@@ -282,12 +282,18 @@ class Guessing(Game):
                     self.human_guess()
                 elif options[0] == 'Computer':
                     print ("\nIt's the computer's turn to play.")
-                    self.computer_guess()
-
+                    self.computer_guess(
+            elif turn == 'Quit':
+                print ("Thank you for playing with me.")
+                #Game.leaderboard()
+                break
+            else:
+                print ("Sorry, I didn't understand your response")
+                        
 
 def main():
     match = Game()
-    leader(match)
+    #leader(match)
 
 def game_name():
     names = ['me', 'you', 'should']
