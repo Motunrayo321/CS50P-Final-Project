@@ -12,20 +12,110 @@ Layout of the project
 """
 
 import random
+import csv
 
 class Player:
 
-    players_id = {'computer': 'ai'}
+    database_file = "players_id.csv"
+    players_id = {}
+
+
+    def name_check(database_file, username):
+        flag = True
+        with open(database_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['username'] == username:
+                    flag = False
+                    break
+
+        #print (Player.players_id)
+        return flag
+
+    def check_database(database_file):
+        with open(database_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                Player.players_id[row['name']] = row['username']
+
+    def make_database(database_file, name, username):
+        #print (Player.players_id)
+
+        flag = Player.name_check(database_file, username)
+
+        if flag:
+            with open(database_file, 'a', newline='\n') as file:
+                writer = csv.DictWriter(file, fieldnames=['name', 'username'])
+                writer.writerow({'name': name, 'username': username})
+        Player.check_database(database_file)
+
+        #print (Player.players_id)
 
     def __init__(self, name, username, score=0):
         self.name = name
         self.username = username
         self.score = score
 
+        Player.make_database(Player.database_file, self.name, self.username,)
+        #print (Player.players_id)
+
 class Game:
 
+    database_file = "players.csv"
     games = ['guessing']
-    players = {'ai': 1000}
+    players = {}
+
+
+    def name_check(database_file, username):
+        flag = True
+        with open(database_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['username'] == username:
+                    flag = False
+                    break
+
+        #print (Player.players_id)
+        return flag
+
+    def check_database(database_file):
+        with open(database_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                #print (row)
+                Game.players[row['username']] = row['score']
+
+    def make_database(database_file, username, score):
+
+        #print (Game.players)
+        with open(database_file, 'a', newline='\n') as file:
+            writer = csv.DictWriter(file, fieldnames=['username', 'score'])
+            writer.writerow({'username': username, 'score': score})
+        Game.check_database(database_file)
+        #print (Game.players)
+
+    def leaderboard():
+        value_list = []
+        for j in Game.players.values():
+            j = int(j)
+            value_list.append(j)
+
+        value_list = sorted(value_list, reverse=True)
+        highest = value_list[0]
+
+        #print (highest)
+
+        value = {i for i in Game.players if Game.players[i]==highest}
+
+        for n in value_list:
+            for i, j in Game.players.items():
+                if int(j) == n:
+                    print (i.title(), j)
+
+        for i, j in Game.players.items():
+            if int(j) == highest:
+                print ('\n')
+                print (f"MVP is {i.title()} with {j} points.")
 
     def __init__(self):
         name = input("What is your name? ")
@@ -33,6 +123,8 @@ class Game:
         # print ("flag")
         username =  input("What name would you like to use in this game? ")
         self.get_info(name, username)
+        Game.make_database(Game.database_file, username, self.score)
+        #print (Game.players)
         self.choose_game()
 
     def get_info(self, name, username):
@@ -52,8 +144,8 @@ class Game:
 
             self.score = player_id.score
 
-            print (Player.players_id)
-            print (cls.players)
+            #print (Player.players_id)
+            #print (cls.players)
 
     @property
     def name(self):
@@ -104,16 +196,6 @@ class Game:
                 case "hangman":
                     Hangman()
 
-    def leaderboard(self):
-        key_list = list(cls.players.item())
-        value_list = list(cls.players.item())
-
-
-        for i in sorted(value_list, reverse=True):
-            position = value_list.index(i)
-            print({key_list[position]: i})
-
-
 class Guessing(Game):
 
     options = ['Human', 'Computer']
@@ -149,6 +231,8 @@ class Guessing(Game):
                 pass
 
         Game.players[self.username] = hum_score
+        Game.make_database(Game.database_file, self.username, hum_score)
+
         print (f"Your score is {hum_score}. Good Job!")
 
     def computer_guess(self):
@@ -199,19 +283,36 @@ class Guessing(Game):
                 elif options[0] == 'Computer':
                     print ("\nIt's the computer's turn to play.")
                     self.computer_guess()
-            elif turn == 'Quit':
-                print ("Thank you for playing with me.")
-                break
-            else:
-                print ("Sorry, I didn't understand your response")
 
 
 def main():
-    print (Player.players_id)
-    print (Game.players)
-    Game()
-    print (Player.players_id)
-    print (Game.players)
+    match = Game()
+    leader(match)
 
+def game_name():
+    names = ['me', 'you', 'should']
+    leader(name[0])
+    no_of_games(name[1])
+    user(name[2])
+    return name
 
-main()
+def leader(name):
+    if name == 'me':
+        return "CS50 will not kill me"
+    else:
+        raise ValueError
+
+def no_of_games(name):
+    if name == 'you':
+        return "You've done enough"
+    else:
+        raise NameError
+
+def user(name):
+    if name == 'should':
+        return "I probably should have started earlier"
+    else:
+        raise ValueError
+
+if __name__ == "__main__":
+    main()
